@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1c20 0%, #283593 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+        }
+        .search-container {
+            text-align: center;
+            margin: 2rem 0 3rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .search-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .search-container h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+        }
+        #searchInput {
+            padding: 15px 20px;
+            width: 400px;
+            max-width: calc(100% - 120px);
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            margin-right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            #searchInput {
+                padding: 12px 15px;
+                font-size: 14px;
+                width: calc(100% - 100px);
+                margin-right: 8px;
+            }
+        }
+
+        #searchInput:focus {
+            outline: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            background: #fff;
+        }
+        #searchButton {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: linear-gradient(45deg, #FF3366, #FF6B6B);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            #searchButton {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        #searchButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 51, 102, 0.4);
+            background: linear-gradient(45deg, #FF6B6B, #FF3366);
+        }
+        #results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            #results {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px 0;
+            }
+        }
+        .movie-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .movie-card img {
+                height: 300px;
+                margin-bottom: 12px;
+            }
+        }
+        .movie-card h2 {
+            margin: 10px 0;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .movie-card h2 {
+                font-size: 1.2rem;
+            }
+        }
+        .movie-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .movie-card p {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+        }
+        .rating {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .loading {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            display: none;
+            color: #fff;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                padding: 15px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-container">
+        <h1>Media Search</h1>
+        <select id="mediaTypeSelect" style="padding: 15px 20px; font-size: 16px; border-radius: 30px; margin-right: 10px; background: rgba(255, 255, 255, 0.9); border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor:pointer; color: #333; height: 50px; vertical-align: middle;">
+            <option value="movie">Movie</option>
+            <option value="tv">TV Show</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Enter name...">
+        <button id="searchButton">Search</button>
+    </div>
+    <div id="loading" class="loading">Searching...</div>
+    <div id="results"></div>
+    </div>
+    <footer class="footer">
+        <p>FAHEEMZTECH @ 2025</p>
+    </footer>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        const mediaTypeSelect = document.getElementById('mediaTypeSelect');
+
+        async function searchMedia() {
+            const query = searchInput.value.trim();
+            const mediaType = mediaTypeSelect.value;
+
+            if (!query) return;
+
+            loadingDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch(`/api/search?query=${encodeURIComponent(query)}&type=${mediaType}`);
+                if (!response.ok) {
+                    let errorMsg = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.error || errorMsg;
+                    } catch (e) {
+                        // If response is not JSON, use the default error message
+                    }
+                    throw new Error(errorMsg);
+                }
+                const details = await response.json();
+
+                let title = '';
+                let dateLabel = '';
+                let dateValue = '';
+                let ratingText = '';
+
+                if (mediaType === 'movie') {
+                    title = details.movie || details.title || 'N/A';
+                    dateLabel = 'Release Date';
+                    dateValue = details.releasedate || 'N/A';
+                    // For movies, the backend currently doesn't provide a direct rating field in 'details' from the text file.
+                    // If you want to add it, ensure 'mediaFetcher.js' extracts it and 'server.js' parses it.
+                } else if (mediaType === 'tv') {
+                    title = details.tvshow || details.name || 'N/A';
+                    dateLabel = 'First Air Date';
+                    dateValue = details.firstairdate || 'N/A';
+                    if (details.voteaverage && details.voteaverage !== 'N/A') {
+                        ratingText = `<p><strong>Rating:</strong> <span class="rating">${details.voteaverage}/10</span></p>`;
+                    }
+                }
+                
+                const description = details.description || 'No description available.';
+                const posterUrl = details.posterurl; // Key from server.js parsing
+
+                if (Object.keys(details).length === 0 && response.ok) {
+                     resultsDiv.innerHTML = `<p style="text-align: center;">No details found for "${query}".</p>`;
+                } else if (title === 'N/A' && description === 'No description available.') {
+                    resultsDiv.innerHTML = `<p style="text-align: center;">No details found for "${query}".</p>`;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="movie-card">
+                            ${posterUrl && posterUrl !== 'No poster available'
+                                ? `<img src="${posterUrl}" alt="${title} poster">`
+                                : '<div style="height: 400px; background: #333; color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 10px; text-align: center;">No poster available</div>'}
+                            <h2>${title}</h2>
+                            <p><strong>${dateLabel}:</strong> ${dateValue}</p>
+                            ${ratingText}
+                            <p>${description}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: #ff6b6b; text-align: center;">Error: ${error.message}</p>`;
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        searchButton.addEventListener('click', searchMedia);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchMedia();
+            }
+        });
+    </script>
+</body>
+</html>
